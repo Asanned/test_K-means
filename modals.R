@@ -32,3 +32,13 @@ errorModal = modalDialog(
   easyClose = TRUE,
   size = 'l'
 )
+
+convergedModal = modalDialog(
+  'The algorithm reached its optimal state, and no points changed clusters during this step.',
+  br(),
+  'If you want to learn more you can check out ', 
+  a(href = 'https://en.wikipedia.org/wiki/K-means_clustering', 'the wikipedia page about the K-means algorithm'),
+  title = 'Nothing happened',
+  easyClose = TRUE,
+  size = 'l'
+)

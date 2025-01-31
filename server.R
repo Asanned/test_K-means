@@ -64,8 +64,12 @@ shinyServer(function(input, output, session){
   })
 
   observeEvent(input$step,{
+    previous_labels = clusters$labels
     clusters$labels = computeNextStep(vals$x, vals$y, clusters$centres, mink_deg[[input$distanceType]])
     clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
+    if (all(clusters$labels == previous_labels)){
+      showModal(convergedModal)
+    }
   })
 
   observeEvent(input$defaultManualClusters, defaultManualClusterInputs(nbClusters(), minValx(), maxValx(), minValy(), maxValy()))
