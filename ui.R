@@ -13,7 +13,7 @@ shinyUI(fluidPage(
 
     # Sidebar ----
     sidebarPanel(
-      p('You can see the source code of this app ', a(href = "https://github.com/Asanned/test_K-means/tree/main/test_K-means", 'here')),
+      p('You can see the source code of this app ', a(href = "https://github.com/Asanned/test_K-means/tree/main", 'here')),
       numericInput('nbNodes', 'Number of nodes', 100, min = 10),
       numericInput('nbClusters', 'Number of clusters', 4, min = 1, max = 9),
 
