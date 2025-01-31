@@ -1,9 +1,11 @@
+# Useful libraries ----
 library(shiny)
 library(shinyjs)
 library(shinyBS)
 library(tidyverse)
 library(rsconnect)
 
+# Constants ----
 source('./modals.R')
 
 clusters.colors = c('black', 'cyan', 'orange', 'purple', 'green', 'red', 'blue', 'brown', 'darkgrey', 'magenta', 'pink')
@@ -15,10 +17,14 @@ coeffs = list(
 
 mink_deg = list(Euclidean = 2, Manhattan = 1)
 
+# Functions ----
+# Computes the Minkowski distance
 distance_Mink = function(p1_x, p1_y, p2_x, p2_y, deg){
   return((((abs(p1_x - p2_x)) ** deg) + ((abs(p1_y - p2_y)) ** deg)) ** (1/deg)) 
 }
 
+# Initializes the labels
+# Called when the reset button is pressed
 getInitialLabels = function(nbNodes, nbClusters){
   labels = rep(0, nbNodes)
 
@@ -30,6 +36,7 @@ getInitialLabels = function(nbNodes, nbClusters){
   return(labels)
 }
 
+# Computes the centroids of the clusters
 updateCenters = function(x, y, labels, nbClusters){
   centres = list(x = rep(0, nbClusters), y = rep(0, nbClusters))
   for (cluster in 1:max(labels)){
@@ -39,8 +46,7 @@ updateCenters = function(x, y, labels, nbClusters){
   return(centres)
 }
 
-
-
+# Computes the next step of the K-means algorithm
 computeNextStep = function(x, y, centres, deg){
   labels = rep(0, length(x))
   for (i in 1:length(x)){
@@ -60,7 +66,7 @@ computeNextStep = function(x, y, centres, deg){
   return(labels)
 }
 
-
+# Dynamically changes the number of clusters that can be set manually
 updateClusterVisibility = function(nbClusters) {
     shinyjs::runjs(sprintf("
       document.querySelectorAll('#cluster-container .cluster').forEach((el, index) => {
@@ -91,6 +97,7 @@ defaultManualClusterInputs = function(nbClusters, minValx, maxValx, minValy, max
   
 }
 
+# Imports the dataframe to use based on user inputs
 updateDataset = function(file, dfName, csvOptions){
   dataframe = NULL
   error = NULL
