@@ -1,11 +1,7 @@
 shinyServer(function(input, output, session){
 
-  # Initialisation des éléments réactifs ----
-  nbNodes = eventReactive(input$reset, input$nbNodes)
-  nbClusters = eventReactive(input$reset, input$nbClusters)
-
+  # Initialisation of reactive values ----
   vals = reactiveValues(x = NULL, y = NULL, labels = NULL)
-  
   clusters = reactiveValues(labels = NULL, centres = list(x = c(), y = c()))
 
   maxValx = reactive({round(max(vals$x), 0)})
@@ -21,60 +17,12 @@ shinyServer(function(input, output, session){
     additional_info_temp = NULL, 
     additional_info = NULL
   )
+  
+  # Only update nbNodes and nbClusters when the reset button is pressed
+  nbNodes = eventReactive(input$reset, input$nbNodes)
+  nbClusters = eventReactive(input$reset, input$nbClusters)
 
-  # Autres fonctions ----
-  observe({
-    if (is.null(vals$x)){
-      if (is.null(dataset$df)){
-        vals$x = runif(nbNodes())
-        vals$y = runif(nbNodes())
-      }
-      if (!input$placeInitClusters){
-        clusters$labels = getInitialLabels(length(vals$x), nbClusters())
-        clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
-      } else {
-        clusters$labels = rep(0, length(vals$x))
-        clusters$centres = list(x = c(), y = c())
-
-        for (i in 1:nbClusters()) {
-          clusters$centres[['x']] = c(clusters$centres[['x']], input[[paste0('manualCluster', i, 'x')]])
-          clusters$centres[['y']] = c(clusters$centres[['y']], input[[paste0('manualCluster', i, 'y')]])
-        }
-      }
-    }
-  })
-
-  observeEvent(input$reset, {
-    if (is.null(dataset$df)){
-      vals$x = runif(nbNodes())
-      vals$y = runif(nbNodes())
-    }
-    if (!input$placeInitClusters){
-      clusters$labels = getInitialLabels(length(vals$x), nbClusters())
-      clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
-    } else {
-      clusters$labels = rep(0, length(vals$x))
-      clusters$centres = list(x = c(), y = c())
-
-      for (i in 1:nbClusters()) {
-        clusters$centres[['x']] = c(clusters$centres[['x']], input[[paste0('manualCluster', i, 'x')]])
-        clusters$centres[['y']] = c(clusters$centres[['y']], input[[paste0('manualCluster', i, 'y')]])
-      }
-    }
-  })
-
-  observeEvent(input$step,{
-    previous_labels = clusters$labels
-    clusters$labels = computeNextStep(vals$x, vals$y, clusters$centres, mink_deg[[input$distanceType]])
-    clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
-    if (all(clusters$labels == previous_labels)){
-      showModal(convergedModal)
-    }
-  })
-
-  observeEvent(input$defaultManualClusters, defaultManualClusterInputs(nbClusters(), minValx(), maxValx(), minValy(), maxValy()))
-
-  # Création du rendu graphique ----
+  # Plot creation ----
   output$kMeans = renderPlot({
     if (!is.null(vals$x) && !is.null(vals$y)){
       plot(
@@ -108,12 +56,41 @@ shinyServer(function(input, output, session){
     }
   }, height=reactive(ifelse(!is.null(input$innerWidth),input$innerWidth*3/5,100)))
 
-  # Affichage de placement des clusters manuels ----
-  observe({
-    updateClusterVisibility(input$nbClusters)
+  # Update values on button press ----
+  observeEvent(input$reset, {
+    if (is.null(dataset$df)){
+      vals$x = runif(nbNodes())
+      vals$y = runif(nbNodes())
+    }
+    if (!input$placeInitClusters){
+      clusters$labels = getInitialLabels(length(vals$x), nbClusters())
+      clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
+    } else {
+      clusters$labels = rep(0, length(vals$x))
+      clusters$centres = list(x = c(), y = c())
+
+      for (i in 1:nbClusters()) {
+        clusters$centres[['x']] = c(clusters$centres[['x']], input[[paste0('manualCluster', i, 'x')]])
+        clusters$centres[['y']] = c(clusters$centres[['y']], input[[paste0('manualCluster', i, 'y')]])
+      }
+    }
   })
 
-  # Affichage du modal de selection de dataset
+  # Compute next step on button press ----
+  observeEvent(input$step,{
+    previous_labels = clusters$labels
+    clusters$labels = computeNextStep(vals$x, vals$y, clusters$centres, mink_deg[[input$distanceType]])
+    clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
+    if (all(clusters$labels == previous_labels)){
+      showModal(convergedModal)
+    }
+  })
+
+  observeEvent(input$defaultManualClusters, defaultManualClusterInputs(nbClusters(), minValx(), maxValx(), minValy(), maxValy()))
+
+  observe({updateClusterVisibility(input$nbClusters)})
+
+  # Logic for the dataset selection modal ----
   observeEvent(input$showDatasetModal, showModal(datasetModal))
 
   observe({
