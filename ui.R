@@ -1,12 +1,17 @@
 shinyUI(fluidPage(
+
   includeCSS('www/styles.css'),
   shinyjs::useShinyjs(),
+
+  # Title ----
   tags$header(
     'Interactive visualization of the K-means algorithm',
     icon('circle-question', id = 'k-means-info'),
     shinyBS::bsTooltip(id = 'k-means-info', title = 'The K-means algorithm is a clustering algorithm which consists in associating each point to the closest cluster centroid at each step.')
   ),
   sidebarLayout(
+
+    # Sidebar ----
     sidebarPanel(
       p('You can see the source code of this app ', a(href = "https://github.com/Asanned/test_K-means/tree/main/test_K-means", 'here')),
       numericInput('nbNodes', 'Number of nodes', 100, min = 10),
@@ -78,6 +83,7 @@ shinyUI(fluidPage(
         )
       )
     ),
+    # Plot output ----
     mainPanel(
       div(
         plotOutput('kMeans'),
@@ -86,16 +92,20 @@ shinyUI(fluidPage(
     )
   ),
 
+  # Javascript code ----
   tags$script(HTML(
     '
+    // set a shiny input variable for the width of the window
     $(document).on("shiny:connected", function(e) {
       Shiny.onInputChange("innerWidth", window.innerWidth);
     });
 
+    // update it on window resize
     $(window).resize(function(e) {
       Shiny.onInputChange("innerWidth", window.innerWidth);
     });
 
+    // Press the reset button as soon as possible to initialize the points and the plot
     $(document).on("shiny:sessioninitialized", function() {
       document.getElementById("reset").click();
     });
