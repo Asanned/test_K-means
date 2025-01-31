@@ -1,0 +1,10 @@
+name: test_k-means
+title:
+username: ethancroise
+account: ethancroise
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13800476
+bundleId: 9718399
+url: https://ethancroise.shinyapps.io/test_k-means/
+version: 1
