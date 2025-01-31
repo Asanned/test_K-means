@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+library(shinyBS)
 library(tidyverse)
 library(rsconnect)
 

@@ -14,7 +14,6 @@
   overflow: scroll;
 }
 
-
 .df-selection #csvOptions {
   display: flex;
   flex-direction: row;
@@ -39,3 +38,11 @@
   margin: 1em auto 1em auto;
 }
 .div7 { grid-area: 4 / 2 / 5 / 3; }
+
+header {
+  margin: 0;
+  background-color: #000088;
+  color: white;
+  font-size: 24px;
+  padding: 0.2em;
+}

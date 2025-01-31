@@ -23,6 +23,27 @@ shinyServer(function(input, output, session){
   )
 
   # Autres fonctions ----
+  observe({
+    if (is.null(vals$x)){
+      if (is.null(dataset$df)){
+        vals$x = runif(nbNodes())
+        vals$y = runif(nbNodes())
+      }
+      if (!input$placeInitClusters){
+        clusters$labels = getInitialLabels(length(vals$x), nbClusters())
+        clusters$centres = updateCenters(vals$x, vals$y, clusters$labels, nbClusters())
+      } else {
+        clusters$labels = rep(0, length(vals$x))
+        clusters$centres = list(x = c(), y = c())
+
+        for (i in 1:nbClusters()) {
+          clusters$centres[['x']] = c(clusters$centres[['x']], input[[paste0('manualCluster', i, 'x')]])
+          clusters$centres[['y']] = c(clusters$centres[['y']], input[[paste0('manualCluster', i, 'y')]])
+        }
+      }
+    }
+  })
+
   observeEvent(input$reset, {
     if (is.null(dataset$df)){
       vals$x = runif(nbNodes())
